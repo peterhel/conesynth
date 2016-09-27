@@ -126,7 +126,8 @@
 			var currentTime = this.context.currentTime;
 			oscillator.start(currentTime);
 			oscillator.stop((currentTime + (length * 60 / tempo) ));
-			oscillator.onended = () => this.play();
+
+			//oscillator.onended = () => this.play();
 		}
 
 		add(noteData) {
@@ -135,64 +136,102 @@
 
 		play() {
 			var args = this.notes.shift();
-			this._play(args[0], args[1]);
+			for(var key in args) {
+				this._play(key, args[key]);	
+			}
+		}
+
+		playNext() {
+			var args = this.notes.shift();
+
+			console.log('playNext', args);
+
+			for(var key in args) {
+				this._play(key, args[key]);	
+			}
 		}
 	}
 
 	var ch1 = new Channel(context, 'triangle', 1);
-	ch1.add(['A2', .5]);
-	ch1.add(['E3', .5]);
-	ch1.add(['A3', .5]);
-	ch1.add(['C4', .5]);
-	ch1.add(['E4', .5]);
-	ch1.add(['A4', .5]);
-	ch1.add(['C5', .5]);
-	ch1.add(['A4', .5]);
-	ch1.add(['E4', .5]);
-	ch1.add(['C4', .5]);
-	ch1.add(['A3', .5]);
-	ch1.add(['E3', .5]);
+	ch1.add({'A2': .5}); //A
+	ch1.add({'E3': .5});
+	ch1.add({'A3': .5});
+	ch1.add({'C4': .5});
+	ch1.add({'E4': .5});
+	ch1.add({'A4': .5});
+	ch1.add({'C5': .5});
+	ch1.add({'A4': .5});
+	ch1.add({'E4': .5});
+	ch1.add({'C4': .5});
+	ch1.add({'A3': .5});
+	ch1.add({'E3': .5});
 
-	ch1.add(['A2', .5]);
-	ch1.add(['E3', .5]);
-	ch1.add(['A3', .5]);
-	ch1.add(['C4', .5]);
-	ch1.add(['E4', .5]);
-	ch1.add(['A4', .5]);
-	ch1.add(['C5', .5]);
-	ch1.add(['A4', .5]);
-	ch1.add(['E4', .5]);
-	ch1.add(['C4', .5]);
-	ch1.add(['A3', .5]);
-	ch1.add(['E3', .5]);
+	ch1.add({'A2': .5}); //G
+	ch1.add({'E3': .5});
+	ch1.add({'A3': .5});
+	ch1.add({'C4': .5});
+	ch1.add({'E4': .5});
+	ch1.add({'A4': .5});
+	ch1.add({'C5': .5});
+	ch1.add({'A4': .5});
+	ch1.add({'E4': .5});
+	ch1.add({'C4': .5});
+	ch1.add({'A3': .5});
+	ch1.add({'E3': .5});
 
-	ch1.add(['A2', .5]);
-	ch1.add(['E3', .5]);
-	ch1.add(['A3', .5]);
-	ch1.add(['C4', .5]);
-	ch1.add(['E4', .5]);
-	ch1.add(['A4', .5]);
-	ch1.add(['B4', .5]);
-	ch1.add(['G4', .5]);
-	ch1.add(['E4', .5]);
-	ch1.add(['B3', .5]);
-	ch1.add(['G3', .5]);
-	ch1.add(['E3', .5]);
+	ch1.add({'A2': .5, 'A5': 3}); // A
+	ch1.add({'E3': .5});
+	ch1.add({'A3': .5});
+	ch1.add({'C4': .5});
+	ch1.add({'E4': .5});
+	ch1.add({'A4': .5});
+	ch1.add({'B4': .5, 'G5': 3});
+	ch1.add({'G4': .5});
+	ch1.add({'E4': .5});
+	ch1.add({'B3': .5});
+	ch1.add({'G3': .5});
+	ch1.add({'E3': .5});
 
-	ch1.add(['A2', .5]);
-	ch1.add(['E3', .5]);
-	ch1.add(['A3', .5]);
-	ch1.add(['C4', .5]);
-	ch1.add(['E4', .5]);
-	ch1.add(['A4', .5]);
-	ch1.add(['C5', .5]);
-	ch1.add(['A4', .5]);
-	ch1.add(['F4', .5]);
-	ch1.add(['C4', .5]);
-	ch1.add(['A3', .5]);
-	ch1.add(['F3', .5]);
+	ch1.add({'A2': .5, 'A5': 3}); // F
+	ch1.add({'E3': .5});
+	ch1.add({'A3': .5});
+	ch1.add({'C4': .5});
+	ch1.add({'E4': .5});
+	ch1.add({'A4': .5});
+	ch1.add({'C5': .5, 'F5': 3});
+	ch1.add({'A4': .5});
+	ch1.add({'F4': .5});
+	ch1.add({'C4': .5});
+	ch1.add({'A3': .5});
+	ch1.add({'F3': .5});
 
-	ch1.play();
+	ch1.add({'G2': .5, 'G5': 3}); // G
+	ch1.add({'D3': .5});
+	ch1.add({'G3': .5});
+	ch1.add({'B3': .5});
+	ch1.add({'D4': .5});
+	ch1.add({'G4': .5});
+	ch1.add({'B4': .5, 'E5': 3}); //Em
+	ch1.add({'G4': .5});
+	ch1.add({'E4': .5});
+	ch1.add({'B3': .5});
+	ch1.add({'G3': .5});
+	ch1.add({'E3': .5});
+
+	ch1.add({'F2': .5, 'F5': 6}); // F
+	ch1.add({'C3': .5});
+	ch1.add({'F3': .5});
+	ch1.add({'A3': .5});
+	ch1.add({'C4': .5});
+	ch1.add({'F4': .5});
+	ch1.add({'C4': .5});
+	ch1.add({'A4': .5});
+	ch1.add({'F4': .5});
+	ch1.add({'C4': .5});
+	ch1.add({'A3': .5});
+	ch1.add({'F3': .5});
+
+	//ch1.play();
 
 	/*************************/
 
@@ -206,7 +245,27 @@
 	ch2.add(['A5', 1]);
 	ch2.add(['F5', 3]);
 
-	ch2.play();
+	//ch2.play();
+
+
+	function tracker() {
+		console.log(tempo);
+		var oscillator = context.createOscillator();
+		oscillator.type = 'sine';
+		oscillator.frequency.value = 0; // value in hertz
+
+		var currentTime = context.currentTime;
+		oscillator.start(currentTime);
+		oscillator.stop((currentTime + (0.5 * 60 / tempo) ));
+		oscillator.onended = () => tracker();
+
+		try { ch1.playNext(); } catch (e) {}
+
+		console.log('Music loop')
+	}
+
+	tracker();
+
 
 </script>
 </body>
