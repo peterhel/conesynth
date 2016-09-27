@@ -102,7 +102,7 @@
 	};
 	// create web audio api context
 	var context = new (window.AudioContext || window.webkitAudioContext)();
-	var tempo = 90;
+	var tempo = 100;
 
 	
 	  class EnvelopeGenerator {
@@ -141,8 +141,6 @@
 		_play(note, length) {
 			// create Oscillator node
 			var oscillator = this.context.createOscillator();
-			//var modulator = this.context.createOscillator();
-			//modulator.frequency.value = 15;
 			var gainNode = this.context.createGain();
 			oscillator.type = this.type;
 			oscillator.frequency.value = notes[note]; // value in hertz
@@ -154,15 +152,11 @@
 			//modulator.connect(gainNode.gain);
 			oscillator.connect(gainNode);
 
-			gainNode.gain.value = 0.0;
+			gainNode.gain.value = 0.05;
 
 			var currentTime = this.context.currentTime;
 			oscillator.start(currentTime);
 			oscillator.stop((currentTime + (length * 60 / tempo) ));
-			//modulator.start(currentTime);
-			//modulator.stop((currentTime + (length * 60 / tempo) ));
-
-			//oscillator.onended = () => this.play();
 		}
 
 		_play2(note, length) {
@@ -185,7 +179,6 @@
 			oscillator.connect(gainNode);
 
 			gainNode2.gain.value = 0.1;
-
 			var currentTime = this.context.currentTime;
 			oscillator.start(currentTime);
 			oscillator.stop((currentTime + (length * 60 / tempo) ));
@@ -193,6 +186,27 @@
 			modulator.stop((currentTime + (length * 60 / tempo) ));
 
 			//oscillator.onended = () => this.play();
+		}
+
+		_playBass(note, length) {
+			// create Oscillator node
+			var oscillator = this.context.createOscillator();
+			var gainNode = this.context.createGain();
+			oscillator.type = 'triangle';
+			oscillator.frequency.value = notes[note]; // value in hertz
+			
+			//var envelope = new EnvelopeGenerator(this.context);
+			//envelope.connect(gainNode.gain);
+			//envelope.trigger()
+			//modulator.connect(gainNode.gain);
+			oscillator.connect(gainNode);
+
+			gainNode.connect(this.context.destination);
+			gainNode.gain.value = 0.4
+
+			var currentTime = this.context.currentTime;
+			oscillator.start(currentTime);
+			oscillator.stop((currentTime + (length * 60 / tempo) ));
 		}
 
 		add(noteData) {
@@ -227,11 +241,16 @@
 				this._play2(key, ch2[key]);	
 			}
 
+			let ch3 = args[2];
+			for(var key in ch3) {
+				this._playBass(key, ch3[key]);	
+			}
+
 		}
 	}
 
 	var ch1 = new Channel(context, 'triangle', 1);
-	ch1.add([{'A2': .5}]); //A
+	ch1.add([{'A2': .5}, {}, {'A1': 6}]); //A
 	ch1.add([{'E3': .5}]);
 	ch1.add([{'A3': .5}]);
 	ch1.add([{'C4': .5}]);
@@ -244,7 +263,7 @@
 	ch1.add([{'A3': .5}]);
 	ch1.add([{'E3': .5}]);
 
-	ch1.add([{'A2': .5}]); //G
+	ch1.add([{'A2': .5}, {}, {'A1': 6}]); //G
 	ch1.add([{'E3': .5}]);
 	ch1.add([{'A3': .5}]);
 	ch1.add([{'C4': .5}]);
@@ -257,46 +276,46 @@
 	ch1.add([{'A3': .5}]);
 	ch1.add([{'E3': .5}]);
 
-	ch1.add([{'A2': .5}, {'A5': 3}]); // A
+	ch1.add([{'A2': .5}, {'C5': 3}, {'A1': 3}]); // A
 	ch1.add([{'E3': .5}]);
 	ch1.add([{'A3': .5}]);
 	ch1.add([{'C4': .5}]);
 	ch1.add([{'E4': .5}]);
 	ch1.add([{'A4': .5}]);
-	ch1.add([{'B4': .5}, {'G5': 3}]);
+	ch1.add([{'B4': .5}, {'B4': 3}, {'G1': 3}]);
 	ch1.add([{'G4': .5}]);
 	ch1.add([{'E4': .5}]);
 	ch1.add([{'B3': .5}]);
 	ch1.add([{'G3': .5}]);
 	ch1.add([{'E3': .5}]);
 
-	ch1.add([{'A2': .5}, {'A5': 3}]); // F
+	ch1.add([{'A2': .5}, {'C5': 3}, {'A1': 3}]); // F
 	ch1.add([{'E3': .5}]);
 	ch1.add([{'A3': .5}]);
 	ch1.add([{'C4': .5}]);
 	ch1.add([{'E4': .5}]);
 	ch1.add([{'A4': .5}]);
-	ch1.add([{'C5': .5}, {'F5': 3}]);
+	ch1.add([{'C5': .5}, {'A4': 3}, {'F1': 3}]);
 	ch1.add([{'A4': .5}]);
 	ch1.add([{'F4': .5}]);
 	ch1.add([{'C4': .5}]);
 	ch1.add([{'A3': .5}]);
 	ch1.add([{'F3': .5}]);
 
-	ch1.add([{'G2': .5}, {'G5': 3}]); // G
+	ch1.add([{'G2': .5}, {'B4': 3}, {'G1': 3}]); // G
 	ch1.add([{'D3': .5}]);
 	ch1.add([{'G3': .5}]);
 	ch1.add([{'B3': .5}]);
 	ch1.add([{'D4': .5}]);
 	ch1.add([{'G4': .5}]);
-	ch1.add([{'B4': .5}, {'E5': 3}]); //Em
+	ch1.add([{'B4': .5}, {'G4': 3}, {'E1': 3}]); //Em
 	ch1.add([{'G4': .5}]);
 	ch1.add([{'E4': .5}]);
 	ch1.add([{'B3': .5}]);
 	ch1.add([{'G3': .5}]);
 	ch1.add([{'E3': .5}]);
 
-	ch1.add([{'F2': .5}, {'F5': 6}]); // F
+	ch1.add([{'F2': .5}, {'A4': 4}]); // F
 	ch1.add([{'C3': .5}]);
 	ch1.add([{'F3': .5}]);
 	ch1.add([{'A3': .5}]);
@@ -304,10 +323,37 @@
 	ch1.add([{'F4': .5}]);
 	ch1.add([{'C5': .5}]);
 	ch1.add([{'A4': .5}]);
-	ch1.add([{'F4': .5}]);
+	ch1.add([{'F4': .5}, {'G4': 1}]);
 	ch1.add([{'C4': .5}]);
-	ch1.add([{'A3': .5}]);
+	ch1.add([{'A3': .5}, {'F4': 1}]);
 	ch1.add([{'F3': .5}]);
+
+	ch1.add([{'C2': .5}, {'E4': 4}]); //A
+	ch1.add([{'G2': .5}]);
+	ch1.add([{'C3': .5}]);
+	ch1.add([{'E3': .5}]);
+	ch1.add([{'G3': .5}]);
+	ch1.add([{'C4': .5}]);
+	ch1.add([{'E4': .5}]);
+	ch1.add([{'C4': .5}]);
+	ch1.add([{'G3': .5}, {'D4': 1}]);
+	ch1.add([{'E3': .5}]);
+	ch1.add([{'C3': .5}, {'C4': 1}]);
+	ch1.add([{'G2': .5}]);
+
+	ch1.add([{'D2': .5}, {'D4': 4}]); //Dm
+	ch1.add([{'A2': .5}]);
+	ch1.add([{'D3': .5}]);
+	ch1.add([{'F3': .5}]);
+	ch1.add([{'A3': .5}]);
+	ch1.add([{'D4': .5}]);
+	ch1.add([{'G4': .5}]);
+	ch1.add([{'D4': .5}]);
+	ch1.add([{'B3': .5}, {'D4': 1}]);
+	ch1.add([{'G3': .5}]);
+	ch1.add([{'D3': .5}, {'C4': 1}]);
+	ch1.add([{'G2': .5}]);
+
 
 	//ch1.play();
 
