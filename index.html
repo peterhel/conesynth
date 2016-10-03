@@ -102,7 +102,7 @@
 	};
 	// create web audio api context
 	var context = new (window.AudioContext || window.webkitAudioContext)();
-	var tempo = 100;
+	var tempo = 140;
 
 	
 	  class EnvelopeGenerator {
@@ -131,82 +131,8 @@
 
 	class Channel {
 		constructor(audioContext, type, gain) {
-			this.context = audioContext;
-			this.type = type;
-			this.gain = gain;
 			this.notes = [];
 			this.hazNotes = true;
-		}
-
-		_play(note, length) {
-			// create Oscillator node
-			var oscillator = this.context.createOscillator();
-			var gainNode = this.context.createGain();
-			oscillator.type = this.type;
-			oscillator.frequency.value = notes[note]; // value in hertz
-			gainNode.connect(this.context.destination)
-			
-			var envelope = new EnvelopeGenerator(this.context);
-			envelope.connect(gainNode.gain);
-			envelope.trigger()
-			//modulator.connect(gainNode.gain);
-			oscillator.connect(gainNode);
-
-			gainNode.gain.value = 0.05;
-
-			var currentTime = this.context.currentTime;
-			oscillator.start(currentTime);
-			oscillator.stop((currentTime + (length * 60 / tempo) ));
-		}
-
-		_play2(note, length) {
-			// create Oscillator node
-			var oscillator = this.context.createOscillator();
-			var modulator = this.context.createOscillator();
-			modulator.frequency.value = 12;
-			var gainNode = this.context.createGain();
-			var gainNode2 = this.context.createGain();
-			oscillator.type = 'triangle';
-			oscillator.frequency.value = notes[note]; // value in hertz
-			gainNode.connect(gainNode2);
-			gainNode2.connect(this.context.destination)
-
-			
-			//var envelope = new EnvelopeGenerator(this.context);
-			//envelope.connect(gainNode.gain);
-			//envelope.trigger()
-			modulator.connect(gainNode.gain);
-			oscillator.connect(gainNode);
-
-			gainNode2.gain.value = 0.1;
-			var currentTime = this.context.currentTime;
-			oscillator.start(currentTime);
-			oscillator.stop((currentTime + (length * 60 / tempo) ));
-			modulator.start(currentTime);
-			modulator.stop((currentTime + (length * 60 / tempo) ));
-
-			//oscillator.onended = () => this.play();
-		}
-
-		_playBass(note, length) {
-			// create Oscillator node
-			var oscillator = this.context.createOscillator();
-			var gainNode = this.context.createGain();
-			oscillator.type = 'triangle';
-			oscillator.frequency.value = notes[note]; // value in hertz
-			
-			//var envelope = new EnvelopeGenerator(this.context);
-			//envelope.connect(gainNode.gain);
-			//envelope.trigger()
-			//modulator.connect(gainNode.gain);
-			oscillator.connect(gainNode);
-
-			gainNode.connect(this.context.destination);
-			gainNode.gain.value = 0.4
-
-			var currentTime = this.context.currentTime;
-			oscillator.start(currentTime);
-			oscillator.stop((currentTime + (length * 60 / tempo) ));
 		}
 
 		add(noteData) {
@@ -228,156 +154,238 @@
 				return;
 			}
 
-			console.log('playNext', args);
-
-			let ch1 = args[0];
-
-			for(var key in ch1) {
-				this._play(key, ch1[key]);	
-			}
-
-			let ch2 = args[1];
-			for(var key in ch2) {
-				this._play2(key, ch2[key]);	
-			}
-
-			let ch3 = args[2];
-			for(var key in ch3) {
-				this._playBass(key, ch3[key]);	
-			}
-
+			args.forEach(ch => {
+				ch();
+			})
 		}
 	}
 
+	function flute() {
+		for(var key in this) {
+			var oscillator = context.createOscillator();
+			var modulator = context.createOscillator();
+			modulator.frequency.value = 12;
+			var gainNode = context.createGain();
+			var gainNode2 = context.createGain();
+			oscillator.type = 'triangle';
+			oscillator.frequency.value = notes[key]; // value in hertz
+			gainNode.connect(gainNode2);
+			gainNode2.connect(context.destination)
+
+			modulator.connect(gainNode.gain);
+			oscillator.connect(gainNode);
+
+			gainNode2.gain.value = 0.1;
+			var currentTime = context.currentTime;
+			oscillator.start(currentTime);
+			oscillator.stop((currentTime + (this[key] * 60 / tempo) ));
+			modulator.start(currentTime);
+			modulator.stop((currentTime + (this[key] * 60 / tempo) ));
+		}
+	}
+
+	function bass() {
+		for(var key in this) {
+			var oscillator = context.createOscillator();
+			var gainNode = context.createGain();
+			oscillator.type = 'triangle';
+			oscillator.frequency.value = notes[key]; // value in hertz
+			
+			oscillator.connect(gainNode);
+
+			gainNode.connect(context.destination);
+			gainNode.gain.value = 0.2
+
+			var currentTime = context.currentTime;
+			oscillator.start(currentTime);
+			oscillator.stop((currentTime + (this[key] * 60 / tempo) ));
+		}
+	}
+
+	function harp() {
+		for(var key in this) {
+			var oscillator = context.createOscillator();
+			var gainNode = context.createGain();
+			gainNode.gain.value = 0.05;
+			oscillator.type = 'square';
+			oscillator.frequency.value = notes[key];
+			
+			oscillator.connect(gainNode);
+
+			gainNode.connect(context.destination)
+
+			var currentTime = context.currentTime;
+			oscillator.start(currentTime);
+			oscillator.stop((currentTime + (this[key] * 60 / tempo) ));
+		}
+	}
+
+
 	var ch1 = new Channel(context, 'triangle', 1);
-	ch1.add([{'A2': .5}, {}, {'A1': 6}]); //A
-	ch1.add([{'E3': .5}]);
-	ch1.add([{'A3': .5}]);
-	ch1.add([{'C4': .5}]);
-	ch1.add([{'E4': .5}]);
-	ch1.add([{'A4': .5}]);
-	ch1.add([{'C5': .5}]);
-	ch1.add([{'A4': .5}]);
-	ch1.add([{'E4': .5}]);
-	ch1.add([{'C4': .5}]);
-	ch1.add([{'A3': .5}]);
-	ch1.add([{'E3': .5}]);
+	ch1.add([harp.bind({'A2': .5})]); //A
+	ch1.add([harp.bind({'E3': .5})]);
+	ch1.add([harp.bind({'A3': .5})]);
+	ch1.add([harp.bind({'C4': .5})]);
+	ch1.add([harp.bind({'E4': .5})]);
+	ch1.add([harp.bind({'A4': .5})]);
+	ch1.add([harp.bind({'C5': .5})]);
+	ch1.add([harp.bind({'A4': .5})]);
+	ch1.add([harp.bind({'E4': .5})]);
+	ch1.add([harp.bind({'C4': .5})]);
+	ch1.add([harp.bind({'A3': .5})]);
+	ch1.add([harp.bind({'E3': .5})]);
 
-	ch1.add([{'A2': .5}, {}, {'A1': 6}]); //G
-	ch1.add([{'E3': .5}]);
-	ch1.add([{'A3': .5}]);
-	ch1.add([{'C4': .5}]);
-	ch1.add([{'E4': .5}]);
-	ch1.add([{'A4': .5}]);
-	ch1.add([{'C5': .5}]);
-	ch1.add([{'A4': .5}]);
-	ch1.add([{'E4': .5}]);
-	ch1.add([{'C4': .5}]);
-	ch1.add([{'A3': .5}]);
-	ch1.add([{'E3': .5}]);
+	ch1.add([harp.bind({'A2': .5}), 
+			 bass.bind({'A2': 6})]); //G
 
-	ch1.add([{'A2': .5}, {'C5': 3}, {'A1': 3}]); // A
-	ch1.add([{'E3': .5}]);
-	ch1.add([{'A3': .5}]);
-	ch1.add([{'C4': .5}]);
-	ch1.add([{'E4': .5}]);
-	ch1.add([{'A4': .5}]);
-	ch1.add([{'B4': .5}, {'B4': 3}, {'G1': 3}]);
-	ch1.add([{'G4': .5}]);
-	ch1.add([{'E4': .5}]);
-	ch1.add([{'B3': .5}]);
-	ch1.add([{'G3': .5}]);
-	ch1.add([{'E3': .5}]);
+	ch1.add([harp.bind({'E3': .5})]);
+	ch1.add([harp.bind({'A3': .5})]);
+	ch1.add([harp.bind({'C4': .5})]);
+	ch1.add([harp.bind({'E4': .5})]);
+	ch1.add([harp.bind({'A4': .5})]);
+	ch1.add([harp.bind({'C5': .5})]);
+	ch1.add([harp.bind({'A4': .5})]);
+	ch1.add([harp.bind({'E4': .5})]);
+	ch1.add([harp.bind({'C4': .5})]);
+	ch1.add([harp.bind({'A3': .5})]);
+	ch1.add([harp.bind({'E3': .5})]);
 
-	ch1.add([{'A2': .5}, {'C5': 3}, {'A1': 3}]); // F
-	ch1.add([{'E3': .5}]);
-	ch1.add([{'A3': .5}]);
-	ch1.add([{'C4': .5}]);
-	ch1.add([{'E4': .5}]);
-	ch1.add([{'A4': .5}]);
-	ch1.add([{'C5': .5}, {'A4': 3}, {'F1': 3}]);
-	ch1.add([{'A4': .5}]);
-	ch1.add([{'F4': .5}]);
-	ch1.add([{'C4': .5}]);
-	ch1.add([{'A3': .5}]);
-	ch1.add([{'F3': .5}]);
+	ch1.add([harp.bind({'A2': .5}), 
+	         flute.bind({'C5': 3}),
+	         bass.bind({'A2': 3})]); // A
+	ch1.add([harp.bind({'E3': .5})]);
+	ch1.add([harp.bind({'A3': .5})]);
+	ch1.add([harp.bind({'C4': .5})]);
+	ch1.add([harp.bind({'E4': .5})]);
+	ch1.add([harp.bind({'A4': .5})]);
+	ch1.add([harp.bind({'B4': .5}),
+		     flute.bind({'B4': 3}), 
+		     bass.bind({'G2': 3})]);
+	ch1.add([harp.bind({'G4': .5})]);
+	ch1.add([harp.bind({'E4': .5})]);
+	ch1.add([harp.bind({'B3': .5})]);
+	ch1.add([harp.bind({'G3': .5})]);
+	ch1.add([harp.bind({'E3': .5})]);
 
-	ch1.add([{'G2': .5}, {'B4': 3}, {'G1': 3}]); // G
-	ch1.add([{'D3': .5}]);
-	ch1.add([{'G3': .5}]);
-	ch1.add([{'B3': .5}]);
-	ch1.add([{'D4': .5}]);
-	ch1.add([{'G4': .5}]);
-	ch1.add([{'B4': .5}, {'G4': 3}, {'E1': 3}]); //Em
-	ch1.add([{'G4': .5}]);
-	ch1.add([{'E4': .5}]);
-	ch1.add([{'B3': .5}]);
-	ch1.add([{'G3': .5}]);
-	ch1.add([{'E3': .5}]);
+	ch1.add([harp.bind({'A2': .5}),
+	         flute.bind({'C5': 3}),
+	         bass.bind({'A2': 3})]); // F
+	ch1.add([harp.bind({'E3': .5})]);
+	ch1.add([harp.bind({'A3': .5})]);
+	ch1.add([harp.bind({'C4': .5})]);
+	ch1.add([harp.bind({'E4': .5})]);
+	ch1.add([harp.bind({'A4': .5})]);
+	ch1.add([harp.bind({'C5': .5}),
+		     flute.bind({'A4': 3}), 
+		     bass.bind({'F2': 3})]);
+	ch1.add([harp.bind({'A4': .5})]);
+	ch1.add([harp.bind({'F4': .5})]);
+	ch1.add([harp.bind({'C4': .5})]);
+	ch1.add([harp.bind({'A3': .5})]);
+	ch1.add([harp.bind({'F3': .5})]);
 
-	ch1.add([{'F2': .5}, {'A4': 4}]); // F
-	ch1.add([{'C3': .5}]);
-	ch1.add([{'F3': .5}]);
-	ch1.add([{'A3': .5}]);
-	ch1.add([{'C4': .5}]);
-	ch1.add([{'F4': .5}]);
-	ch1.add([{'C5': .5}]);
-	ch1.add([{'A4': .5}]);
-	ch1.add([{'F4': .5}, {'G4': 1}]);
-	ch1.add([{'C4': .5}]);
-	ch1.add([{'A3': .5}, {'F4': 1}]);
-	ch1.add([{'F3': .5}]);
+	ch1.add([harp.bind({'G2': .5}),
+	         flute.bind({'B4': 3}),
+	         bass.bind({'G2': 3})]); // G
+	ch1.add([harp.bind({'D3': .5})]);
+	ch1.add([harp.bind({'G3': .5})]);
+	ch1.add([harp.bind({'B3': .5})]);
+	ch1.add([harp.bind({'D4': .5})]);
+	ch1.add([harp.bind({'G4': .5})]);
+	ch1.add([harp.bind({'B4': .5}),
+	         flute.bind({'G4': 3}),
+	         bass.bind({'E2': 3})]); //Em
+	ch1.add([harp.bind({'G4': .5})]);
+	ch1.add([harp.bind({'E4': .5})]);
+	ch1.add([harp.bind({'B3': .5})]);
+	ch1.add([harp.bind({'G3': .5})]);
+	ch1.add([harp.bind({'E3': .5})]);
 
-	ch1.add([{'C2': .5}, {'E4': 4}]); //A
-	ch1.add([{'G2': .5}]);
-	ch1.add([{'C3': .5}]);
-	ch1.add([{'E3': .5}]);
-	ch1.add([{'G3': .5}]);
-	ch1.add([{'C4': .5}]);
-	ch1.add([{'E4': .5}]);
-	ch1.add([{'C4': .5}]);
-	ch1.add([{'G3': .5}, {'D4': 1}]);
-	ch1.add([{'E3': .5}]);
-	ch1.add([{'C3': .5}, {'C4': 1}]);
-	ch1.add([{'G2': .5}]);
+	ch1.add([harp.bind({'F2': .5}), 
+	         flute.bind({'A4': 4}),
+	         bass.bind({'F2': 4})]); // F
+	ch1.add([harp.bind({'C3': .5})]);
+	ch1.add([harp.bind({'F3': .5})]);
+	ch1.add([harp.bind({'A3': .5})]);
+	ch1.add([harp.bind({'C4': .5})]);
+	ch1.add([harp.bind({'F4': .5})]);
+	ch1.add([harp.bind({'C5': .5})]);
+	ch1.add([harp.bind({'A4': .5})]);
+	ch1.add([harp.bind({'F4': .5}), flute.bind({'G4': 1}), bass.bind({'E2': 1})]);
+	ch1.add([harp.bind({'C4': .5})]);
+	ch1.add([harp.bind({'A3': .5}), flute.bind({'F4': 1}), bass.bind({'D2': 1})]);
+	ch1.add([harp.bind({'F3': .5})]);
 
-	ch1.add([{'D2': .5}, {'D4': 4}]); //Dm
-	ch1.add([{'A2': .5}]);
-	ch1.add([{'D3': .5}]);
-	ch1.add([{'F3': .5}]);
-	ch1.add([{'A3': .5}]);
-	ch1.add([{'D4': .5}]);
-	ch1.add([{'G4': .5}]);
-	ch1.add([{'D4': .5}]);
-	ch1.add([{'B3': .5}, {'D4': 1}]);
-	ch1.add([{'G3': .5}]);
-	ch1.add([{'D3': .5}, {'C4': 1}]);
-	ch1.add([{'G2': .5}]);
+	ch1.add([harp.bind({'C2': .5}), flute.bind({'E4': 4}), bass.bind({'C2': 4})]);
+	ch1.add([harp.bind({'G2': .5})]);
+	ch1.add([harp.bind({'C3': .5})]);
+	ch1.add([harp.bind({'E3': .5})]);
+	ch1.add([harp.bind({'G3': .5})]);
+	ch1.add([harp.bind({'C4': .5})]);
+	ch1.add([harp.bind({'E4': .5})]);
+	ch1.add([harp.bind({'C4': .5})]);
+	ch1.add([harp.bind({'G3': .5}), flute.bind({'D4': 1}), bass.bind({'B1': 1})]);
+	ch1.add([harp.bind({'E3': .5})]);
+	ch1.add([harp.bind({'C3': .5}), flute.bind({'C4': 1}), bass.bind({'A1': 1})]);
+	ch1.add([harp.bind({'G2': .5})]);
 
+	ch1.add([harp.bind({'C2': .5}), flute.bind({'D4': 3}), bass.bind({'B1': 3})]);
+	ch1.add([harp.bind({'G2': .5})]);
+	ch1.add([harp.bind({'C3': .5})]);
+	ch1.add([harp.bind({'E3': .5})]);
+	ch1.add([harp.bind({'G3': .5})]);
+	ch1.add([harp.bind({'C4': .5})]);
+	ch1.add([harp.bind({'G3': .5}), flute.bind({'C4': 2}), bass.bind({'A1': 2})]);
+	ch1.add([harp.bind({'E4': .5})]);
+	ch1.add([harp.bind({'C4': .5})]);
+	ch1.add([harp.bind({'E3': .5})]);
+	ch1.add([harp.bind({'C3': .5}), flute.bind({'D4': 1}), bass.bind({'B1': 1})]);
+	ch1.add([harp.bind({'G2': .5})]);
 
-	//ch1.play();
+	ch1.add([harp.bind({'C2': .5}), flute.bind({'E4': 4}), bass.bind({'C2': 4})]);
+	ch1.add([harp.bind({'G2': .5})]);
+	ch1.add([harp.bind({'C3': .5})]);
+	ch1.add([harp.bind({'E3': .5})]);
+	ch1.add([harp.bind({'G3': .5})]);
+	ch1.add([harp.bind({'C4': .5})]);
+	ch1.add([harp.bind({'E4': .5})]);
+	ch1.add([harp.bind({'C4': .5})]);
+	ch1.add([harp.bind({'G3': .5}), flute.bind({'D4': 1}), bass.bind({'B1': 1})]);
+	ch1.add([harp.bind({'E3': .5})]);
+	ch1.add([harp.bind({'C3': .5}), flute.bind({'C4': 1}), bass.bind({'A1': 1})]);
+	ch1.add([harp.bind({'G2': .5})]);
 
-	/*************************/
+	ch1.add([harp.bind({'G2': .5}), flute.bind({'B3': 3}), bass.bind({'G1': 3})]);
+	ch1.add([harp.bind({'D2': .5})]);
+	ch1.add([harp.bind({'G3': .5})]);
+	ch1.add([harp.bind({'B3': .5})]);
+	ch1.add([harp.bind({'D3': .5})]);
+	ch1.add([harp.bind({'G4': .5})]);
+	ch1.add([harp.bind({'B3': .5}), flute.bind({'G3': 2}), bass.bind({'E1': 3})]);
+	ch1.add([harp.bind({'G4': .5})]);
+	ch1.add([harp.bind({'E4': .5})]);
+	ch1.add([harp.bind({'B3': .5})]);
+	ch1.add([harp.bind({'E3': .5}), flute.bind({'E3': 1})]);
+	ch1.add([harp.bind({'B2': .5})]);
 
-	var ch2 = new Channel(context, 'sine', 1);
-
-	ch2.add(['XX', 12]);
-	ch2.add(['A5', 2]);
-	ch2.add(['A5', 1]);
-	ch2.add(['G5', 3]);
-	ch2.add(['A5', 2]);
-	ch2.add(['A5', 1]);
-	ch2.add(['F5', 3]);
-
-	//ch2.play();
-
+	ch1.add([harp.bind({'A2': .5}), flute.bind({'A3': 6}), bass.bind({'A1': 6})]);
+	ch1.add([harp.bind({'E2': .5})]);
+	ch1.add([harp.bind({'A3': .5})]);
+	ch1.add([harp.bind({'C3': .5})]);
+	ch1.add([harp.bind({'E3': .5})]);
+	ch1.add([harp.bind({'A4': .5})]);
+	ch1.add([harp.bind({'C3': .5})]);
+	ch1.add([harp.bind({'A4': .5})]);
+	ch1.add([harp.bind({'E4': .5})]);
+	ch1.add([harp.bind({'C3': .5})]);
+	ch1.add([harp.bind({'A3': .5})]);
+	ch1.add([harp.bind({'E2': .5})]);
 
 	function tracker() {
-		console.log(tempo);
 		var oscillator = context.createOscillator();
 		var gain = context.createGain();
 		oscillator.type = 'sine';
-		oscillator.frequency.value = 0; // value in hertz
+		oscillator.frequency.value = 0;
 		gain.connect(context.destination);
 		oscillator.connect(gain);
 		gain.value = 0;
@@ -385,17 +393,13 @@
 		oscillator.start(currentTime);
 		oscillator.stop((currentTime + (0.5 * 60 / tempo) ));
 
-		//try { ch1.playNext(); } catch (e) {}
 		if(ch1.hazNotes) {
 			oscillator.onended = () => tracker();
 			ch1.playNext();	
 		}
-		console.log('Music loop')
 	}
 
 	tracker();
-
-
 </script>
 </body>
 </html>
