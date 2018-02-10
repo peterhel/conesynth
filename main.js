@@ -15,7 +15,7 @@ const controller = {
 
 // create web audio api context
 var context = new (window.AudioContext || window.webkitAudioContext)();
-var tempo = 140;
+var tempo = 93;
 
 class EnvelopeGenerator {
     constructor(context) {
@@ -78,84 +78,103 @@ class Channel {
     }
 
     skip(steps = 8) {
-        let nextPosition = this.position + steps;
-        this.position = nextPosition < 0 ? 0 : nextPosition;
-        console.log(this.position, steps);
+        if(steps < 0) {
+            let toSubtract = (this.position) % 12;
+            toSubtract = toSubtract < 4 ? 12 + toSubtract: toSubtract;
+            const nextPosition = this.position - toSubtract;
+            this.position = nextPosition < 0 ? 0 : nextPosition;
+        } else {
+            const toSubtract = (this.position) % 12;
+            this.position = (this.position - toSubtract) + 12;
+        }
+
+        this.fireProgress();
+    }
+
+    goto(position) {
+        this.position = position;
+        this.fireProgress();
     }
 }
 
 const ch1 = new Channel(context, 'triangle', 1);
-ch1.add([harp(['A2', '0.5'])]); //A
-ch1.add([harp(['E3', '0.5'])]);
-ch1.add([harp(['A3', '0.5'])]);
-ch1.add([harp(['C4', '0.5'])]);
-ch1.add([harp(['E4', '0.5'])]);
-ch1.add([harp(['A4', '0.5'])]);
-ch1.add([harp(['C5', '0.5'])]);
-ch1.add([harp(['A4', '0.5'])]);
-ch1.add([harp(['E4', '0.5'])]);
-ch1.add([harp(['C4', '0.5'])]);
-ch1.add([harp(['A3', '0.5'])]);
-ch1.add([harp(['E3', '0.5'])]);
+const position = localStorage.getItem('conan.position');
+if (!isNaN(position)) ch1.goto(position);
 
-ch1.add([harp(['A2', '0.5']), bass(['A2', '6'])]); //G
 
-ch1.add([harp(['E3', '0.5'])]);
-ch1.add([harp(['A3', '0.5'])]);
-ch1.add([harp(['C4', '0.5'])]);
-ch1.add([harp(['E4', '0.5'])]);
-ch1.add([harp(['A4', '0.5'])]);
-ch1.add([harp(['C5', '0.5'])]);
-ch1.add([harp(['A4', '0.5'])]);
-ch1.add([harp(['E4', '0.5'])]);
-ch1.add([harp(['C4', '0.5'])]);
-ch1.add([harp(['A3', '0.5'])]);
-ch1.add([harp(['E3', '0.5'])]);
 
-ch1.add([harp(['A2', '0.5']), flute(['C5', '3']), bass(['A2', '3'])]); // A
-ch1.add([harp(['E3', '0.5'])]);
-ch1.add([harp(['A3', '0.5'])]);
-ch1.add([harp(['C4', '0.5'])]);
-ch1.add([harp(['E4', '0.5'])]);
-ch1.add([harp(['A4', '0.5'])]);
-ch1.add([harp(['B4', '0.5']), flute(['B4', '3']), bass(['G2', '3'])]);
-ch1.add([harp(['G4', '0.5'])]);
-ch1.add([harp(['E4', '0.5'])]);
-ch1.add([harp(['B3', '0.5'])]);
-ch1.add([harp(['G3', '0.5'])]);
-ch1.add([harp(['E3', '0.5'])]);
 
-ch1.add([harp(['A2', '0.5']), flute(['C5', '3']), bass(['A2', '3'])]); // F
-ch1.add([harp(['E3', '0.5'])]);
-ch1.add([harp(['A3', '0.5'])]);
-ch1.add([harp(['C4', '0.5'])]);
-ch1.add([harp(['E4', '0.5'])]);
-ch1.add([harp(['A4', '0.5'])]);
-ch1.add([harp(['C5', '0.5']), flute(['A4', '3']), bass(['F2', '3'])]);
-ch1.add([harp(['A4', '0.5'])]);
-ch1.add([harp(['F4', '0.5'])]);
-ch1.add([harp(['C4', '0.5'])]);
-ch1.add([harp(['A3', '0.5'])]);
-ch1.add([harp(['F3', '0.5'])]);
-
-ch1.add([harp(['G2', '0.5']), flute(['B4', '3']), bass(['G2', '3'])]); // G
+ch1.add([harp(['G2', '0.5'])]);
 ch1.add([harp(['D3', '0.5'])]);
 ch1.add([harp(['G3', '0.5'])]);
-ch1.add([harp(['B3', '0.5'])]);
+ch1.add([harp(['A#3', '0.5'])]);
 ch1.add([harp(['D4', '0.5'])]);
 ch1.add([harp(['G4', '0.5'])]);
-ch1.add([harp(['B4', '0.5']), flute(['G4', '3']), bass(['E2', '3'])]); //Em
+ch1.add([harp(['A#4', '0.5'])]);
 ch1.add([harp(['G4', '0.5'])]);
-ch1.add([harp(['E4', '0.5'])]);
-ch1.add([harp(['B3', '0.5'])]);
+ch1.add([harp(['D4', '0.5'])]);
+ch1.add([harp(['A#3', '0.5'])]);
 ch1.add([harp(['G3', '0.5'])]);
-ch1.add([harp(['E3', '0.5'])]);
+ch1.add([harp(['D3', '0.5'])]);
 
-ch1.add([harp(['F2', '0.5']), flute(['A4', '4']), bass(['F2', '4'])]); // F
+ch1.add([harp(['G2', '0.5']), bass(['A2', '6'])]); //G
+
+ch1.add([harp(['D3', '0.5'])]);
+ch1.add([harp(['G3', '0.5'])]);
+ch1.add([harp(['A#3', '0.5'])]);
+ch1.add([harp(['D4', '0.5'])]);
+ch1.add([harp(['G4', '0.5'])]);
+ch1.add([harp(['A#4', '0.5'])]);
+ch1.add([harp(['G4', '0.5'])]);
+ch1.add([harp(['D4', '0.5'])]);
+ch1.add([harp(['A#3', '0.5'])]);
+ch1.add([harp(['G3', '0.5'])]);
+ch1.add([harp(['D3', '0.5'])]);
+
+ch1.add([harp(['G2', '0.5']), flute(['C5', '3']), bass(['A2', '3'])]); // A
+ch1.add([harp(['D3', '0.5'])]);
+ch1.add([harp(['G3', '0.5'])]);
+ch1.add([harp(['A#3', '0.5'])]);
+ch1.add([harp(['D4', '0.5'])]);
+ch1.add([harp(['G4', '0.5'])]);
+ch1.add([harp(['A4', '0.5']), flute(['B4', '3']), bass(['G2', '3'])]);
+ch1.add([harp(['F4', '0.5'])]);
+ch1.add([harp(['D4', '0.5'])]);
+ch1.add([harp(['A3', '0.5'])]);
+ch1.add([harp(['F3', '0.5'])]);
+ch1.add([harp(['D3', '0.5'])]);
+
+ch1.add([harp(['G2', '0.5']), flute(['C5', '3']), bass(['A2', '3'])]); // F
+ch1.add([harp(['D3', '0.5'])]);
+ch1.add([harp(['G3', '0.5'])]);
+ch1.add([harp(['A#3', '0.5'])]);
+ch1.add([harp(['D4', '0.5'])]);
+ch1.add([harp(['G4', '0.5'])]);
+ch1.add([harp(['A#4', '0.5']), flute(['A4', '3']), bass(['F2', '3'])]);
+ch1.add([harp(['G4', '0.5'])]);
+ch1.add([harp(['D#4', '0.5'])]);
+ch1.add([harp(['A#3', '0.5'])]);
+ch1.add([harp(['G3', '0.5'])]);
+ch1.add([harp(['D#3', '0.5'])]);
+
+ch1.add([harp(['F2', '0.5']), flute(['B4', '3']), bass(['G2', '3'])]); // G
 ch1.add([harp(['C3', '0.5'])]);
 ch1.add([harp(['F3', '0.5'])]);
 ch1.add([harp(['A3', '0.5'])]);
 ch1.add([harp(['C4', '0.5'])]);
+ch1.add([harp(['F4', '0.5'])]);
+ch1.add([harp(['A4', '0.5']), flute(['G4', '3']), bass(['E2', '3'])]); //Em
+ch1.add([harp(['F4', '0.5'])]);
+ch1.add([harp(['D4', '0.5'])]);
+ch1.add([harp(['A3', '0.5'])]);
+ch1.add([harp(['F3', '0.5'])]);
+ch1.add([harp(['D3', '0.5'])]);
+
+ch1.add([harp(['D#2', '0.5']), flute(['A4', '4']), bass(['F2', '4'])]); // F
+ch1.add([harp(['A#2', '0.5'])]);
+ch1.add([harp(['D#3', '0.5'])]);
+ch1.add([harp(['G3', '0.5'])]);
+ch1.add([harp(['A#3', '0.5'])]);
 ch1.add([harp(['F4', '0.5'])]);
 ch1.add([harp(['C5', '0.5'])]);
 ch1.add([harp(['A4', '0.5'])]);
@@ -164,70 +183,70 @@ ch1.add([harp(['C4', '0.5'])]);
 ch1.add([harp(['A3', '0.5']), flute(['F4', '1']), bass(['D2', '1'])]);
 ch1.add([harp(['F3', '0.5'])]);
 
-ch1.add([harp(['C2', '0.5']), flute(['E4', '4']), bass(['C2', '4'])]);
-ch1.add([harp(['G2', '0.5'])]);
-ch1.add([harp(['C3', '0.5'])]);
-ch1.add([harp(['E3', '0.5'])]);
-ch1.add([harp(['G3', '0.5'])]);
-ch1.add([harp(['C4', '0.5'])]);
-ch1.add([harp(['E4', '0.5'])]);
-ch1.add([harp(['C4', '0.5'])]);
-ch1.add([harp(['G3', '0.5']), flute(['D4', '1']), bass(['B1', '1'])]);
-ch1.add([harp(['E3', '0.5'])]);
-ch1.add([harp(['C3', '0.5']), flute(['C4', '1']), bass(['A1', '1'])]);
-ch1.add([harp(['G2', '0.5'])]);
-
-ch1.add([harp(['C2', '0.5']), flute(['D4', '3']), bass(['B1', '3'])]);
-ch1.add([harp(['G2', '0.5'])]);
-ch1.add([harp(['C3', '0.5'])]);
-ch1.add([harp(['E3', '0.5'])]);
-ch1.add([harp(['G3', '0.5'])]);
-ch1.add([harp(['C4', '0.5'])]);
-ch1.add([harp(['G3', '0.5']), flute(['C4', '2']), bass(['A1', '2'])]);
-ch1.add([harp(['E4', '0.5'])]);
-ch1.add([harp(['C4', '0.5'])]);
-ch1.add([harp(['E3', '0.5'])]);
-ch1.add([harp(['C3', '0.5']), flute(['D4', '1']), bass(['B1', '1'])]);
-ch1.add([harp(['G2', '0.5'])]);
-
-ch1.add([harp(['C2', '0.5']), flute(['E4', '4']), bass(['C2', '4'])]);
-ch1.add([harp(['G2', '0.5'])]);
-ch1.add([harp(['C3', '0.5'])]);
-ch1.add([harp(['E3', '0.5'])]);
-ch1.add([harp(['G3', '0.5'])]);
-ch1.add([harp(['C4', '0.5'])]);
-ch1.add([harp(['E4', '0.5'])]);
-ch1.add([harp(['C4', '0.5'])]);
-ch1.add([harp(['G3', '0.5']), flute(['D4', '1']), bass(['B1', '1'])]);
-ch1.add([harp(['E3', '0.5'])]);
-ch1.add([harp(['C3', '0.5']), flute(['C4', '1']), bass(['A1', '1'])]);
-ch1.add([harp(['G2', '0.5'])]);
-
-ch1.add([harp(['G2', '0.5']), flute(['B3', '3']), bass(['G1', '3'])]);
-ch1.add([harp(['D2', '0.5'])]);
-ch1.add([harp(['G3', '0.5'])]);
-ch1.add([harp(['B3', '0.5'])]);
-ch1.add([harp(['D3', '0.5'])]);
-ch1.add([harp(['G4', '0.5'])]);
-ch1.add([harp(['B3', '0.5']), flute(['G3', '2']), bass(['E1', '3'])]);
-ch1.add([harp(['G4', '0.5'])]);
-ch1.add([harp(['E4', '0.5'])]);
-ch1.add([harp(['B3', '0.5'])]);
-ch1.add([harp(['E3', '0.5']), flute(['E3', '1'])]);
-ch1.add([harp(['B2', '0.5'])]);
-
-ch1.add([harp(['A2', '0.5']), flute(['A3', '6']), bass(['A1', '6'])]);
-ch1.add([harp(['E2', '0.5'])]);
-ch1.add([harp(['A3', '0.5'])]);
-ch1.add([harp(['C3', '0.5'])]);
-ch1.add([harp(['E3', '0.5'])]);
-ch1.add([harp(['A4', '0.5'])]);
-ch1.add([harp(['C3', '0.5'])]);
-ch1.add([harp(['A4', '0.5'])]);
-ch1.add([harp(['E4', '0.5'])]);
-ch1.add([harp(['C3', '0.5'])]);
-ch1.add([harp(['A3', '0.5'])]);
-ch1.add([harp(['E2', '0.5'])]);
+// ch1.add([harp(['C2', '0.5']), flute(['E4', '4']), bass(['C2', '4'])]);
+// ch1.add([harp(['G2', '0.5'])]);
+// ch1.add([harp(['C3', '0.5'])]);
+// ch1.add([harp(['E3', '0.5'])]);
+// ch1.add([harp(['G3', '0.5'])]);
+// ch1.add([harp(['C4', '0.5'])]);
+// ch1.add([harp(['E4', '0.5'])]);
+// ch1.add([harp(['C4', '0.5'])]);
+// ch1.add([harp(['G3', '0.5']), flute(['D4', '1']), bass(['B1', '1'])]);
+// ch1.add([harp(['E3', '0.5'])]);
+// ch1.add([harp(['C3', '0.5']), flute(['C4', '1']), bass(['A1', '1'])]);
+// ch1.add([harp(['G2', '0.5'])]);
+//
+// ch1.add([harp(['C2', '0.5']), flute(['D4', '3']), bass(['B1', '3'])]);
+// ch1.add([harp(['G2', '0.5'])]);
+// ch1.add([harp(['C3', '0.5'])]);
+// ch1.add([harp(['E3', '0.5'])]);
+// ch1.add([harp(['G3', '0.5'])]);
+// ch1.add([harp(['C4', '0.5'])]);
+// ch1.add([harp(['G3', '0.5']), flute(['C4', '2']), bass(['A1', '2'])]);
+// ch1.add([harp(['E4', '0.5'])]);
+// ch1.add([harp(['C4', '0.5'])]);
+// ch1.add([harp(['E3', '0.5'])]);
+// ch1.add([harp(['C3', '0.5']), flute(['D4', '1']), bass(['B1', '1'])]);
+// ch1.add([harp(['G2', '0.5'])]);
+//
+// ch1.add([harp(['C2', '0.5']), flute(['E4', '4']), bass(['C2', '4'])]);
+// ch1.add([harp(['G2', '0.5'])]);
+// ch1.add([harp(['C3', '0.5'])]);
+// ch1.add([harp(['E3', '0.5'])]);
+// ch1.add([harp(['G3', '0.5'])]);
+// ch1.add([harp(['C4', '0.5'])]);
+// ch1.add([harp(['E4', '0.5'])]);
+// ch1.add([harp(['C4', '0.5'])]);
+// ch1.add([harp(['G3', '0.5']), flute(['D4', '1']), bass(['B1', '1'])]);
+// ch1.add([harp(['E3', '0.5'])]);
+// ch1.add([harp(['C3', '0.5']), flute(['C4', '1']), bass(['A1', '1'])]);
+// ch1.add([harp(['G2', '0.5'])]);
+//
+// ch1.add([harp(['G2', '0.5']), flute(['B3', '3']), bass(['G1', '3'])]);
+// ch1.add([harp(['D2', '0.5'])]);
+// ch1.add([harp(['G3', '0.5'])]);
+// ch1.add([harp(['B3', '0.5'])]);
+// ch1.add([harp(['D3', '0.5'])]);
+// ch1.add([harp(['G4', '0.5'])]);
+// ch1.add([harp(['B3', '0.5']), flute(['G3', '2']), bass(['E1', '3'])]);
+// ch1.add([harp(['G4', '0.5'])]);
+// ch1.add([harp(['E4', '0.5'])]);
+// ch1.add([harp(['B3', '0.5'])]);
+// ch1.add([harp(['E3', '0.5']), flute(['E3', '1'])]);
+// ch1.add([harp(['B2', '0.5'])]);
+//
+// ch1.add([harp(['A2', '0.5']), flute(['A3', '6']), bass(['A1', '6'])]);
+// ch1.add([harp(['E2', '0.5'])]);
+// ch1.add([harp(['A3', '0.5'])]);
+// ch1.add([harp(['C3', '0.5'])]);
+// ch1.add([harp(['E3', '0.5'])]);
+// ch1.add([harp(['A4', '0.5'])]);
+// ch1.add([harp(['C3', '0.5'])]);
+// ch1.add([harp(['A4', '0.5'])]);
+// ch1.add([harp(['E4', '0.5'])]);
+// ch1.add([harp(['C3', '0.5'])]);
+// ch1.add([harp(['A3', '0.5'])]);
+// ch1.add([harp(['E2', '0.5'])]);
 
 function tracker() {
     var oscillator = context.createOscillator();
@@ -246,3 +265,7 @@ function tracker() {
         ch1.playNext();
     }
 }
+
+ch1.onProgress(position => {
+    localStorage.setItem('conan.position', position);
+});
