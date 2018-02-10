@@ -2,12 +2,25 @@
 <html>
 <head>
 	<title>Cones</title>
-	<script src="notes.js" type="application/javascript"></script>
-	<script src="main.js" type="text/javascript"></script>
+	<script src="notes.js"></script>
+	<script src="bass.js"></script>
+	<script src="flute.js"></script>
+	<script src="harp.js"></script>
+	<script src="main.js"></script>
 </head>
 <body>
-<button onclick="skip(-8)">&lt;</button>
-<button onclick="play()">Play</button>
-<button onclick="skip(8)">&gt;</button>
+<button onclick="controller.skip(-8)">&lt;</button>
+<button onclick="controller.play()">Play</button>
+<button onclick="controller.skip(8)">&gt;</button>
+<div id="progress-outer" style="width: 300px; height:50px; background-color: beige">
+	<div id="progress-inner" style="height: 100%; background-color: black"></div>
+</div>
+<script>
+	const progressInner = document.getElementById('progress-inner');
+	ch1.onProgress(fract => {
+		progressInner.style.width = `${fract * 100}%`;
+	})
+</script>
 </body>
 </html>
+

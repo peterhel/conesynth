@@ -1,3 +1,18 @@
+let isPlaying = false;
+const controller = {
+    play: () => {
+        if (!isPlaying) {
+            isPlaying = true;
+            tracker();
+        } else {
+            isPlaying = false;
+        }
+    },
+    skip: steps => {
+        ch1.skip(steps);
+    }
+};
+
 // create web audio api context
 var context = new (window.AudioContext || window.webkitAudioContext)();
 var tempo = 140;
@@ -39,11 +54,12 @@ class Channel {
     }
 
     onProgress(fn) {
-        this.progressListeners.push(fn)
+        this.progressListeners.push(fn);
+        fn(this.position);
     }
 
     fireProgress() {
-        this.progressListeners.forEach(l => l(Math.round((this.position/this.notes.length)*1000)/1000));
+        this.progressListeners.forEach(l => l(Math.round(this.position / this.notes.length * 1000) / 1000));
     }
 
     playNext() {
@@ -62,220 +78,162 @@ class Channel {
     }
 
     skip(steps = 8) {
-        this.position += 8;
+        let nextPosition = this.position + steps;
+        this.position = nextPosition < 0 ? 0 : nextPosition;
+        console.log(this.position, steps);
     }
 }
 
-function flute() {
-    for (var key in this) {
-        var oscillator = context.createOscillator();
-        var modulator = context.createOscillator();
-        modulator.frequency.value = 12;
-        var gainNode = context.createGain();
-        var gainNode2 = context.createGain();
-        oscillator.type = 'triangle';
-        oscillator.frequency.value = notes[key]; // value in hertz
-        gainNode.connect(gainNode2);
-        gainNode2.connect(context.destination);
+const ch1 = new Channel(context, 'triangle', 1);
+ch1.add([harp(['A2', '0.5'])]); //A
+ch1.add([harp(['E3', '0.5'])]);
+ch1.add([harp(['A3', '0.5'])]);
+ch1.add([harp(['C4', '0.5'])]);
+ch1.add([harp(['E4', '0.5'])]);
+ch1.add([harp(['A4', '0.5'])]);
+ch1.add([harp(['C5', '0.5'])]);
+ch1.add([harp(['A4', '0.5'])]);
+ch1.add([harp(['E4', '0.5'])]);
+ch1.add([harp(['C4', '0.5'])]);
+ch1.add([harp(['A3', '0.5'])]);
+ch1.add([harp(['E3', '0.5'])]);
 
-        modulator.connect(gainNode.gain);
-        oscillator.connect(gainNode);
+ch1.add([harp(['A2', '0.5']), bass(['A2', '6'])]); //G
 
-        gainNode2.gain.value = 0.1;
-        var currentTime = context.currentTime;
-        oscillator.start(currentTime);
-        oscillator.stop(currentTime + this[key] * 60 / tempo);
-        modulator.start(currentTime);
-        modulator.stop(currentTime + this[key] * 60 / tempo);
-    }
-}
+ch1.add([harp(['E3', '0.5'])]);
+ch1.add([harp(['A3', '0.5'])]);
+ch1.add([harp(['C4', '0.5'])]);
+ch1.add([harp(['E4', '0.5'])]);
+ch1.add([harp(['A4', '0.5'])]);
+ch1.add([harp(['C5', '0.5'])]);
+ch1.add([harp(['A4', '0.5'])]);
+ch1.add([harp(['E4', '0.5'])]);
+ch1.add([harp(['C4', '0.5'])]);
+ch1.add([harp(['A3', '0.5'])]);
+ch1.add([harp(['E3', '0.5'])]);
 
-function bass() {
-    for (var key in this) {
-        var oscillator = context.createOscillator();
-        var gainNode = context.createGain();
-        oscillator.type = 'triangle';
-        oscillator.frequency.value = notes[key]; // value in hertz
+ch1.add([harp(['A2', '0.5']), flute(['C5', '3']), bass(['A2', '3'])]); // A
+ch1.add([harp(['E3', '0.5'])]);
+ch1.add([harp(['A3', '0.5'])]);
+ch1.add([harp(['C4', '0.5'])]);
+ch1.add([harp(['E4', '0.5'])]);
+ch1.add([harp(['A4', '0.5'])]);
+ch1.add([harp(['B4', '0.5']), flute(['B4', '3']), bass(['G2', '3'])]);
+ch1.add([harp(['G4', '0.5'])]);
+ch1.add([harp(['E4', '0.5'])]);
+ch1.add([harp(['B3', '0.5'])]);
+ch1.add([harp(['G3', '0.5'])]);
+ch1.add([harp(['E3', '0.5'])]);
 
-        oscillator.connect(gainNode);
+ch1.add([harp(['A2', '0.5']), flute(['C5', '3']), bass(['A2', '3'])]); // F
+ch1.add([harp(['E3', '0.5'])]);
+ch1.add([harp(['A3', '0.5'])]);
+ch1.add([harp(['C4', '0.5'])]);
+ch1.add([harp(['E4', '0.5'])]);
+ch1.add([harp(['A4', '0.5'])]);
+ch1.add([harp(['C5', '0.5']), flute(['A4', '3']), bass(['F2', '3'])]);
+ch1.add([harp(['A4', '0.5'])]);
+ch1.add([harp(['F4', '0.5'])]);
+ch1.add([harp(['C4', '0.5'])]);
+ch1.add([harp(['A3', '0.5'])]);
+ch1.add([harp(['F3', '0.5'])]);
 
-        gainNode.connect(context.destination);
-        gainNode.gain.value = 0.2;
+ch1.add([harp(['G2', '0.5']), flute(['B4', '3']), bass(['G2', '3'])]); // G
+ch1.add([harp(['D3', '0.5'])]);
+ch1.add([harp(['G3', '0.5'])]);
+ch1.add([harp(['B3', '0.5'])]);
+ch1.add([harp(['D4', '0.5'])]);
+ch1.add([harp(['G4', '0.5'])]);
+ch1.add([harp(['B4', '0.5']), flute(['G4', '3']), bass(['E2', '3'])]); //Em
+ch1.add([harp(['G4', '0.5'])]);
+ch1.add([harp(['E4', '0.5'])]);
+ch1.add([harp(['B3', '0.5'])]);
+ch1.add([harp(['G3', '0.5'])]);
+ch1.add([harp(['E3', '0.5'])]);
 
-        var currentTime = context.currentTime;
-        oscillator.start(currentTime);
-        oscillator.stop(currentTime + this[key] * 60 / tempo);
-    }
-}
+ch1.add([harp(['F2', '0.5']), flute(['A4', '4']), bass(['F2', '4'])]); // F
+ch1.add([harp(['C3', '0.5'])]);
+ch1.add([harp(['F3', '0.5'])]);
+ch1.add([harp(['A3', '0.5'])]);
+ch1.add([harp(['C4', '0.5'])]);
+ch1.add([harp(['F4', '0.5'])]);
+ch1.add([harp(['C5', '0.5'])]);
+ch1.add([harp(['A4', '0.5'])]);
+ch1.add([harp(['F4', '0.5']), flute(['G4', '1']), bass(['E2', '1'])]);
+ch1.add([harp(['C4', '0.5'])]);
+ch1.add([harp(['A3', '0.5']), flute(['F4', '1']), bass(['D2', '1'])]);
+ch1.add([harp(['F3', '0.5'])]);
 
-function harp() {
-    for (var key in this) {
-        var oscillator = context.createOscillator();
-        var gainNode = context.createGain();
-        gainNode.gain.value = 0.05;
-        oscillator.type = 'square';
-        oscillator.frequency.value = notes[key];
+ch1.add([harp(['C2', '0.5']), flute(['E4', '4']), bass(['C2', '4'])]);
+ch1.add([harp(['G2', '0.5'])]);
+ch1.add([harp(['C3', '0.5'])]);
+ch1.add([harp(['E3', '0.5'])]);
+ch1.add([harp(['G3', '0.5'])]);
+ch1.add([harp(['C4', '0.5'])]);
+ch1.add([harp(['E4', '0.5'])]);
+ch1.add([harp(['C4', '0.5'])]);
+ch1.add([harp(['G3', '0.5']), flute(['D4', '1']), bass(['B1', '1'])]);
+ch1.add([harp(['E3', '0.5'])]);
+ch1.add([harp(['C3', '0.5']), flute(['C4', '1']), bass(['A1', '1'])]);
+ch1.add([harp(['G2', '0.5'])]);
 
-        oscillator.connect(gainNode);
+ch1.add([harp(['C2', '0.5']), flute(['D4', '3']), bass(['B1', '3'])]);
+ch1.add([harp(['G2', '0.5'])]);
+ch1.add([harp(['C3', '0.5'])]);
+ch1.add([harp(['E3', '0.5'])]);
+ch1.add([harp(['G3', '0.5'])]);
+ch1.add([harp(['C4', '0.5'])]);
+ch1.add([harp(['G3', '0.5']), flute(['C4', '2']), bass(['A1', '2'])]);
+ch1.add([harp(['E4', '0.5'])]);
+ch1.add([harp(['C4', '0.5'])]);
+ch1.add([harp(['E3', '0.5'])]);
+ch1.add([harp(['C3', '0.5']), flute(['D4', '1']), bass(['B1', '1'])]);
+ch1.add([harp(['G2', '0.5'])]);
 
-        gainNode.connect(context.destination);
+ch1.add([harp(['C2', '0.5']), flute(['E4', '4']), bass(['C2', '4'])]);
+ch1.add([harp(['G2', '0.5'])]);
+ch1.add([harp(['C3', '0.5'])]);
+ch1.add([harp(['E3', '0.5'])]);
+ch1.add([harp(['G3', '0.5'])]);
+ch1.add([harp(['C4', '0.5'])]);
+ch1.add([harp(['E4', '0.5'])]);
+ch1.add([harp(['C4', '0.5'])]);
+ch1.add([harp(['G3', '0.5']), flute(['D4', '1']), bass(['B1', '1'])]);
+ch1.add([harp(['E3', '0.5'])]);
+ch1.add([harp(['C3', '0.5']), flute(['C4', '1']), bass(['A1', '1'])]);
+ch1.add([harp(['G2', '0.5'])]);
 
-        var currentTime = context.currentTime;
-        oscillator.start(currentTime);
-        oscillator.stop(currentTime + this[key] * 60 / tempo);
-    }
-}
+ch1.add([harp(['G2', '0.5']), flute(['B3', '3']), bass(['G1', '3'])]);
+ch1.add([harp(['D2', '0.5'])]);
+ch1.add([harp(['G3', '0.5'])]);
+ch1.add([harp(['B3', '0.5'])]);
+ch1.add([harp(['D3', '0.5'])]);
+ch1.add([harp(['G4', '0.5'])]);
+ch1.add([harp(['B3', '0.5']), flute(['G3', '2']), bass(['E1', '3'])]);
+ch1.add([harp(['G4', '0.5'])]);
+ch1.add([harp(['E4', '0.5'])]);
+ch1.add([harp(['B3', '0.5'])]);
+ch1.add([harp(['E3', '0.5']), flute(['E3', '1'])]);
+ch1.add([harp(['B2', '0.5'])]);
 
-var ch1 = new Channel(context, 'triangle', 1);
-ch1.add([harp.bind({ A2: 0.5 })]); //A
-ch1.add([harp.bind({ E3: 0.5 })]);
-ch1.add([harp.bind({ A3: 0.5 })]);
-ch1.add([harp.bind({ C4: 0.5 })]);
-ch1.add([harp.bind({ E4: 0.5 })]);
-ch1.add([harp.bind({ A4: 0.5 })]);
-ch1.add([harp.bind({ C5: 0.5 })]);
-ch1.add([harp.bind({ A4: 0.5 })]);
-ch1.add([harp.bind({ E4: 0.5 })]);
-ch1.add([harp.bind({ C4: 0.5 })]);
-ch1.add([harp.bind({ A3: 0.5 })]);
-ch1.add([harp.bind({ E3: 0.5 })]);
-
-ch1.add([harp.bind({ A2: 0.5 }), bass.bind({ A2: 6 })]); //G
-
-ch1.add([harp.bind({ E3: 0.5 })]);
-ch1.add([harp.bind({ A3: 0.5 })]);
-ch1.add([harp.bind({ C4: 0.5 })]);
-ch1.add([harp.bind({ E4: 0.5 })]);
-ch1.add([harp.bind({ A4: 0.5 })]);
-ch1.add([harp.bind({ C5: 0.5 })]);
-ch1.add([harp.bind({ A4: 0.5 })]);
-ch1.add([harp.bind({ E4: 0.5 })]);
-ch1.add([harp.bind({ C4: 0.5 })]);
-ch1.add([harp.bind({ A3: 0.5 })]);
-ch1.add([harp.bind({ E3: 0.5 })]);
-
-ch1.add([harp.bind({ A2: 0.5 }), flute.bind({ C5: 3 }), bass.bind({ A2: 3 })]); // A
-ch1.add([harp.bind({ E3: 0.5 })]);
-ch1.add([harp.bind({ A3: 0.5 })]);
-ch1.add([harp.bind({ C4: 0.5 })]);
-ch1.add([harp.bind({ E4: 0.5 })]);
-ch1.add([harp.bind({ A4: 0.5 })]);
-ch1.add([harp.bind({ B4: 0.5 }), flute.bind({ B4: 3 }), bass.bind({ G2: 3 })]);
-ch1.add([harp.bind({ G4: 0.5 })]);
-ch1.add([harp.bind({ E4: 0.5 })]);
-ch1.add([harp.bind({ B3: 0.5 })]);
-ch1.add([harp.bind({ G3: 0.5 })]);
-ch1.add([harp.bind({ E3: 0.5 })]);
-
-ch1.add([harp.bind({ A2: 0.5 }), flute.bind({ C5: 3 }), bass.bind({ A2: 3 })]); // F
-ch1.add([harp.bind({ E3: 0.5 })]);
-ch1.add([harp.bind({ A3: 0.5 })]);
-ch1.add([harp.bind({ C4: 0.5 })]);
-ch1.add([harp.bind({ E4: 0.5 })]);
-ch1.add([harp.bind({ A4: 0.5 })]);
-ch1.add([harp.bind({ C5: 0.5 }), flute.bind({ A4: 3 }), bass.bind({ F2: 3 })]);
-ch1.add([harp.bind({ A4: 0.5 })]);
-ch1.add([harp.bind({ F4: 0.5 })]);
-ch1.add([harp.bind({ C4: 0.5 })]);
-ch1.add([harp.bind({ A3: 0.5 })]);
-ch1.add([harp.bind({ F3: 0.5 })]);
-
-ch1.add([harp.bind({ G2: 0.5 }), flute.bind({ B4: 3 }), bass.bind({ G2: 3 })]); // G
-ch1.add([harp.bind({ D3: 0.5 })]);
-ch1.add([harp.bind({ G3: 0.5 })]);
-ch1.add([harp.bind({ B3: 0.5 })]);
-ch1.add([harp.bind({ D4: 0.5 })]);
-ch1.add([harp.bind({ G4: 0.5 })]);
-ch1.add([harp.bind({ B4: 0.5 }), flute.bind({ G4: 3 }), bass.bind({ E2: 3 })]); //Em
-ch1.add([harp.bind({ G4: 0.5 })]);
-ch1.add([harp.bind({ E4: 0.5 })]);
-ch1.add([harp.bind({ B3: 0.5 })]);
-ch1.add([harp.bind({ G3: 0.5 })]);
-ch1.add([harp.bind({ E3: 0.5 })]);
-
-ch1.add([harp.bind({ F2: 0.5 }), flute.bind({ A4: 4 }), bass.bind({ F2: 4 })]); // F
-ch1.add([harp.bind({ C3: 0.5 })]);
-ch1.add([harp.bind({ F3: 0.5 })]);
-ch1.add([harp.bind({ A3: 0.5 })]);
-ch1.add([harp.bind({ C4: 0.5 })]);
-ch1.add([harp.bind({ F4: 0.5 })]);
-ch1.add([harp.bind({ C5: 0.5 })]);
-ch1.add([harp.bind({ A4: 0.5 })]);
-ch1.add([harp.bind({ F4: 0.5 }), flute.bind({ G4: 1 }), bass.bind({ E2: 1 })]);
-ch1.add([harp.bind({ C4: 0.5 })]);
-ch1.add([harp.bind({ A3: 0.5 }), flute.bind({ F4: 1 }), bass.bind({ D2: 1 })]);
-ch1.add([harp.bind({ F3: 0.5 })]);
-
-ch1.add([harp.bind({ C2: 0.5 }), flute.bind({ E4: 4 }), bass.bind({ C2: 4 })]);
-ch1.add([harp.bind({ G2: 0.5 })]);
-ch1.add([harp.bind({ C3: 0.5 })]);
-ch1.add([harp.bind({ E3: 0.5 })]);
-ch1.add([harp.bind({ G3: 0.5 })]);
-ch1.add([harp.bind({ C4: 0.5 })]);
-ch1.add([harp.bind({ E4: 0.5 })]);
-ch1.add([harp.bind({ C4: 0.5 })]);
-ch1.add([harp.bind({ G3: 0.5 }), flute.bind({ D4: 1 }), bass.bind({ B1: 1 })]);
-ch1.add([harp.bind({ E3: 0.5 })]);
-ch1.add([harp.bind({ C3: 0.5 }), flute.bind({ C4: 1 }), bass.bind({ A1: 1 })]);
-ch1.add([harp.bind({ G2: 0.5 })]);
-
-ch1.add([harp.bind({ C2: 0.5 }), flute.bind({ D4: 3 }), bass.bind({ B1: 3 })]);
-ch1.add([harp.bind({ G2: 0.5 })]);
-ch1.add([harp.bind({ C3: 0.5 })]);
-ch1.add([harp.bind({ E3: 0.5 })]);
-ch1.add([harp.bind({ G3: 0.5 })]);
-ch1.add([harp.bind({ C4: 0.5 })]);
-ch1.add([harp.bind({ G3: 0.5 }), flute.bind({ C4: 2 }), bass.bind({ A1: 2 })]);
-ch1.add([harp.bind({ E4: 0.5 })]);
-ch1.add([harp.bind({ C4: 0.5 })]);
-ch1.add([harp.bind({ E3: 0.5 })]);
-ch1.add([harp.bind({ C3: 0.5 }), flute.bind({ D4: 1 }), bass.bind({ B1: 1 })]);
-ch1.add([harp.bind({ G2: 0.5 })]);
-
-ch1.add([harp.bind({ C2: 0.5 }), flute.bind({ E4: 4 }), bass.bind({ C2: 4 })]);
-ch1.add([harp.bind({ G2: 0.5 })]);
-ch1.add([harp.bind({ C3: 0.5 })]);
-ch1.add([harp.bind({ E3: 0.5 })]);
-ch1.add([harp.bind({ G3: 0.5 })]);
-ch1.add([harp.bind({ C4: 0.5 })]);
-ch1.add([harp.bind({ E4: 0.5 })]);
-ch1.add([harp.bind({ C4: 0.5 })]);
-ch1.add([harp.bind({ G3: 0.5 }), flute.bind({ D4: 1 }), bass.bind({ B1: 1 })]);
-ch1.add([harp.bind({ E3: 0.5 })]);
-ch1.add([harp.bind({ C3: 0.5 }), flute.bind({ C4: 1 }), bass.bind({ A1: 1 })]);
-ch1.add([harp.bind({ G2: 0.5 })]);
-
-ch1.add([harp.bind({ G2: 0.5 }), flute.bind({ B3: 3 }), bass.bind({ G1: 3 })]);
-ch1.add([harp.bind({ D2: 0.5 })]);
-ch1.add([harp.bind({ G3: 0.5 })]);
-ch1.add([harp.bind({ B3: 0.5 })]);
-ch1.add([harp.bind({ D3: 0.5 })]);
-ch1.add([harp.bind({ G4: 0.5 })]);
-ch1.add([harp.bind({ B3: 0.5 }), flute.bind({ G3: 2 }), bass.bind({ E1: 3 })]);
-ch1.add([harp.bind({ G4: 0.5 })]);
-ch1.add([harp.bind({ E4: 0.5 })]);
-ch1.add([harp.bind({ B3: 0.5 })]);
-ch1.add([harp.bind({ E3: 0.5 }), flute.bind({ E3: 1 })]);
-ch1.add([harp.bind({ B2: 0.5 })]);
-
-ch1.add([harp.bind({ A2: 0.5 }), flute.bind({ A3: 6 }), bass.bind({ A1: 6 })]);
-ch1.add([harp.bind({ E2: 0.5 })]);
-ch1.add([harp.bind({ A3: 0.5 })]);
-ch1.add([harp.bind({ C3: 0.5 })]);
-ch1.add([harp.bind({ E3: 0.5 })]);
-ch1.add([harp.bind({ A4: 0.5 })]);
-ch1.add([harp.bind({ C3: 0.5 })]);
-ch1.add([harp.bind({ A4: 0.5 })]);
-ch1.add([harp.bind({ E4: 0.5 })]);
-ch1.add([harp.bind({ C3: 0.5 })]);
-ch1.add([harp.bind({ A3: 0.5 })]);
-ch1.add([harp.bind({ E2: 0.5 })]);
+ch1.add([harp(['A2', '0.5']), flute(['A3', '6']), bass(['A1', '6'])]);
+ch1.add([harp(['E2', '0.5'])]);
+ch1.add([harp(['A3', '0.5'])]);
+ch1.add([harp(['C3', '0.5'])]);
+ch1.add([harp(['E3', '0.5'])]);
+ch1.add([harp(['A4', '0.5'])]);
+ch1.add([harp(['C3', '0.5'])]);
+ch1.add([harp(['A4', '0.5'])]);
+ch1.add([harp(['E4', '0.5'])]);
+ch1.add([harp(['C3', '0.5'])]);
+ch1.add([harp(['A3', '0.5'])]);
+ch1.add([harp(['E2', '0.5'])]);
 
 function tracker() {
     var oscillator = context.createOscillator();
     var gain = context.createGain();
     oscillator.type = 'sine';
-    oscillator.frequency.value = 0;
+    oscillator.frequency.setValueAtTime(0, 0);
     gain.connect(context.destination);
     oscillator.connect(gain);
     gain.value = 0;
@@ -288,20 +246,3 @@ function tracker() {
         ch1.playNext();
     }
 }
-
-// tracker();
-let isPlaying = false;
-window.play = () => {
-    if (!isPlaying) {
-        isPlaying = true;
-        tracker();
-    } else {
-        isPlaying = false;
-    }
-};
-
-window.skip = steps => {
-    ch1.skip(steps);
-};
-
-ch1.onProgress(console.log);
